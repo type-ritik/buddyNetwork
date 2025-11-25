@@ -2,10 +2,12 @@ package com.buddyNetwork.BuddyNetwork.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,6 +64,24 @@ public class HelloController {
         // TODO: process POST request
         System.out.println(entity);
         return "Hello " + entity;
+    }
+
+    @GetMapping("/all/headers")
+    public String getAllHeaders(@RequestHeader MultiValueMap<String, String> headers) {
+        headers.forEach((key, value) -> System.out.println(key + ": " + value));
+        return "All headers printed to console!";
+    }
+
+    @GetMapping("/chunck/header")
+    public String getHeader(@RequestHeader("User-Agent") String userAgent,
+            @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        System.out.println("User-Agent: " + userAgent);
+        if (authorizationHeader != null) {
+            System.out.println("Authorization: " + authorizationHeader);
+        } else {
+            System.out.println("Authorization header not present.");
+        }
+        return "Data retrieved successfully!";
     }
 
 }
