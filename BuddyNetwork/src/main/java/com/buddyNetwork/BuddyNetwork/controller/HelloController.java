@@ -15,6 +15,9 @@ import com.buddyNetwork.BuddyNetwork.repository.ErrorResponse;
 import com.buddyNetwork.BuddyNetwork.repository.MyResponseObject;
 import com.buddyNetwork.BuddyNetwork.repository.UserRepo;
 
+import ch.qos.logback.core.model.Model;
+import jakarta.servlet.http.HttpSession;
+
 @RestController
 @RequestMapping("/api")
 public class HelloController {
@@ -61,7 +64,6 @@ public class HelloController {
     // HTTP POST: /path request (Post user name and say Hello to Client)
     @PostMapping("path")
     public String postMethodName(@RequestBody String entity) {
-        // TODO: process POST request
         System.out.println(entity);
         return "Hello " + entity;
     }
@@ -82,6 +84,19 @@ public class HelloController {
             System.out.println("Authorization header not present.");
         }
         return "Data retrieved successfully!";
+    }
+
+    @GetMapping("/set/session")
+    public String setSession(HttpSession session) {
+        session.setAttribute("token", "Shadow Garden");
+        return "Session set successfully!";
+    }
+
+    @GetMapping("/get/session")
+    public String getSession(HttpSession session) {
+        String ssion = (String) session.getAttribute("token");
+        System.err.println(ssion);
+        return ssion;
     }
 
 }
