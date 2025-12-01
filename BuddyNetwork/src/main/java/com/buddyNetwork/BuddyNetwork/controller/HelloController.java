@@ -15,8 +15,8 @@ import com.buddyNetwork.BuddyNetwork.repository.ErrorResponse;
 import com.buddyNetwork.BuddyNetwork.repository.MyResponseObject;
 import com.buddyNetwork.BuddyNetwork.repository.UserRepo;
 
-import ch.qos.logback.core.model.Model;
 import jakarta.servlet.http.HttpSession;
+import com.buddyNetwork.BuddyNetwork.model.Employee;
 
 @RestController
 @RequestMapping("/api")
@@ -55,7 +55,7 @@ public class HelloController {
     // HTTP POST: /users request (Post user data to server)
     @PostMapping("/users")
     public ResponseEntity<String> postName(@RequestBody UserRepo user) {
-        String name = user.getName();
+        String name = user.getFullName();
 
         System.out.println("Received name: " + name);
         return ResponseEntity.ok("User created with name: " + name);
@@ -88,7 +88,7 @@ public class HelloController {
 
     @GetMapping("/set/session")
     public String setSession(HttpSession session) {
-        session.setAttribute("token", "Shadow Garden");
+        session.setAttribute("token", "Mini Skirt");
         return "Session set successfully!";
     }
 
@@ -99,4 +99,26 @@ public class HelloController {
         return ssion;
     }
 
+    @GetMapping("/employee")
+    public Employee getEmployee() {
+        // Employee emp = new Employee(1L, "Ritik", "Software Engineering");
+
+        Employee emp = new Employee();
+        emp.setId(1L);
+        emp.setName("Ritik");
+        emp.setDepartment("Software Engineering");
+
+        return emp;
+        // return new Employee(1L, "Ritik", "Software Engineering");
+    }
+
+    @PostMapping("/employee")
+    public Employee addEmployee(@RequestBody Employee newEmployee) {
+        Employee emp = new Employee();
+        emp.setId(newEmployee.getId());
+        emp.setName(newEmployee.getName());
+        emp.setDepartment(newEmployee.getDepartment());
+
+        return emp;
+    }
 }
