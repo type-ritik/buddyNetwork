@@ -1,5 +1,9 @@
 package com.buddyNetwork.BuddyNetwork.model;
 
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,25 +13,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Employee {
 
     // Change the name of the 'id' property to 'employeeId'
-    @JsonProperty("employeeId")
+    @JsonAlias({ "employeeId", "employee_id", "id" })
     private Long id;
 
     @JsonProperty("employeeName")
     private String name;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateOfBirth;
+
     // Ignore the 'department' property
     @JsonIgnore
     private String department;
 
-    public Employee(Long id, String name, String department) {
+    public Employee(Long id, String name, String department, LocalDate dateOfBirth) {
         this.id = id;
         this.name = name;
         this.department = department;
+        this.dateOfBirth = dateOfBirth;
     }
 
-    public Employee(Long id, String name) {
+    public Employee(Long id, String name, LocalDate dateOfBirth) {
         this.id = id;
         this.name = name;
+        this.dateOfBirth = dateOfBirth;
     }
 
     public Employee() {
@@ -46,6 +55,10 @@ public class Employee {
         this.department = department;
     }
 
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
     public Long getId() {
         return id;
     }
@@ -56,6 +69,10 @@ public class Employee {
 
     public String getDepartment() {
         return department;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
     }
 
 }
