@@ -26,6 +26,8 @@ public class Employee {
     @JsonIgnore
     private String department;
 
+    private Department department2;
+
     public Employee(Long id, String name, String department, LocalDate dateOfBirth) {
         this.id = id;
         this.name = name;
