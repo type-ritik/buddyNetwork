@@ -1,5 +1,7 @@
 package com.buddyNetwork.BuddyNetwork.controller;
 
+import java.time.LocalDate;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -107,6 +109,7 @@ public class HelloController {
         emp.setId(1L);
         emp.setName("Ritik");
         emp.setDepartment("Software Engineering");
+        emp.setDateOfBirth(LocalDate.now());
 
         return emp;
         // return new Employee(1L, "Ritik", "Software Engineering");
@@ -118,6 +121,7 @@ public class HelloController {
         emp.setId(newEmployee.getId());
         emp.setName(newEmployee.getName());
         emp.setDepartment(newEmployee.getDepartment());
+        emp.setDateOfBirth(newEmployee.getDateOfBirth());
 
         return emp;
     }
