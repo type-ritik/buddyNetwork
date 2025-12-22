@@ -1,39 +1,37 @@
 package com.buddyNetwork.BuddyNetwork.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.buddyNetwork.BuddyNetwork.dto.UserAuthRequestDTO;
+import com.buddyNetwork.BuddyNetwork.dto.UserAuthResponseDTO;
+import com.buddyNetwork.BuddyNetwork.model.User;
+import com.buddyNetwork.BuddyNetwork.service.UserService;
 
-import com.buddyNetwork.BuddyNetwork.repository.UserRepo;
+import jakarta.validation.Valid;
 
 // Auth Controller to Signup and login User and ...
 @RestController
 @RequestMapping("/auth")
 public class AuthenticateUser {
-    private String fullName;
-    private String emailAddress;
-    private String password;
+
+    private final UserService userService;
+
+    public AuthenticateUser(UserService userService) {
+        this.userService = userService;
+    }
 
     // HTTP POST: /auth/signup request (Create new User Account)
-    @PostMapping("/signup")
-    public String signupUser(@RequestBody UserRepo userInfo) {
-        // Set User Fullname()
-        userInfo.setFullName();
-        // Fetch User FullName
-        this.fullName = userInfo.getFullName();
-        // Fetch User Valid EmailAddress
-        this.emailAddress = userInfo.getEmailAddress();
-        // Fetch User Valid Password
-        this.password = userInfo.getPassword();
+    @PostMapping("/user/signup")
+    public ResponseEntity<UserAuthResponseDTO> signupUser(
+            @Valid @RequestBody UserAuthRequestDTO request) {
+        // Call UserService to handle signup logic (to be implemented)
+        User userEntity = new User(request);
+        UserAuthResponseDTO userAuth = userService.createUser(userEntity);
 
-        System.out.println("User signed up with email: " + this.emailAddress + " successfully!");
-
-        System.out.println("User signed up with password: " + this.password + " successfully!");
-
-        System.out.println("User signed up with name: " + this.fullName + " successfully!");
-
-        // Return Response Account Creation is Successful
-        return "User signed up with name: " + this.fullName;
+        return ResponseEntity.status(HttpStatus.CREATED).body(userAuth);
     }
 }
