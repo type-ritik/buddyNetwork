@@ -1,5 +1,7 @@
 package com.buddyNetwork.BuddyNetwork.model;
 
+import com.buddyNetwork.BuddyNetwork.dto.UserAuthRequestDTO;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +22,15 @@ public class User {
     private String email;
     private char gender;
     private boolean isadmin;
+
+    public User(UserAuthRequestDTO userAuthRequestDTO) {
+        this.username = userAuthRequestDTO.username();
+        this.fullname = userAuthRequestDTO.fullname();
+        this.password = userAuthRequestDTO.password();
+        this.email = userAuthRequestDTO.email();
+        this.gender = userAuthRequestDTO.gender();
+        this.isadmin = userAuthRequestDTO.isadmin();
+    }
 
     public Long getId() {
         return id;
