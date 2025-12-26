@@ -22,6 +22,7 @@ public class UserService {
     }
 
     public UserAuthResponseDTO createUser(User reqUser) {
+
         if (reqUser.getEmail() == null) {
             throw new IllegalArgumentException("Email is required");
         }
@@ -47,5 +48,33 @@ public class UserService {
 
         return response;
 
+    }
+
+    public User authenticateUser(User reqUser) {
+        User existingUser = userRepository.findByEmail(reqUser.getEmail());
+
+        if (existingUser == null) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+
+        if (!passwordEncoder.matches(reqUser.getPassword(), existingUser.getPassword())) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+
+        return existingUser;
+    }
+
+    public User loadUserByUsername(String username) {
+        if (username.length() < 3) {
+            throw new IllegalArgumentException("Username must be at least 3 characters long");
+        }
+
+        User user = userRepository.findByUsername(username);
+
+        if (user.getFullname() == null) {
+            throw new IllegalArgumentException("User not found with username: " + username);
+        }
+
+        return user;
     }
 }

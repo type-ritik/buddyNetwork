@@ -11,11 +11,13 @@ import com.buddyNetwork.BuddyNetwork.model.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByEmail(String email);
+    User findByEmail(String email);
 
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+
+    User findByUsername(String username);
 
     boolean existsById(Long id);
 }
