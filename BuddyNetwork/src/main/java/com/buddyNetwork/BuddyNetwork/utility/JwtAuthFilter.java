@@ -11,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.buddyNetwork.BuddyNetwork.service.UserService;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,9 +28,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filter) {
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filter)
+            throws ServletException, IOException {
+        String path = req.getServletPath();
+
+        // Skip JWT check for public endpoints
+        if (path.startsWith("/api/auth/v1/register") || path.startsWith("/api/auth/v1/login")
+                || path.equals("/api/public")) {
+            filter.doFilter(req, res);
+            return;
+        }
+
+        String authHeader = req.getHeader("Authorization");
+
         try {
-            String authHeader = req.getHeader("Authorization");
 
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
@@ -45,12 +57,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 }
+                filter.doFilter(req, res);
             }
-            filter.doFilter(req, res);
         } catch (ServletException e) {
             throw new RuntimeException(e);
+        } catch (JwtException e) {
+            throw new JwtException("Token error: " + e.getLocalizedMessage());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IOException(e);
         }
     }
 }
