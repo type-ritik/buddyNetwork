@@ -15,11 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.buddyNetwork.BuddyNetwork.repository.ErrorResponse;
 import com.buddyNetwork.BuddyNetwork.repository.MyResponseObject;
-import com.buddyNetwork.BuddyNetwork.repository.UserRepo;
+// import com.buddyNetwork.BuddyNetwork.repository.UserRepo;
 
 import jakarta.servlet.http.HttpSession;
-import com.buddyNetwork.BuddyNetwork.model.Employee;
+import lombok.extern.slf4j.Slf4j;
 
+import com.buddyNetwork.BuddyNetwork.model.Employee;
+import com.buddyNetwork.BuddyNetwork.model.User;
+
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class HelloController {
@@ -27,6 +31,7 @@ public class HelloController {
     // HTTP GET: /hello request (simple hello java)
     @GetMapping("/hello")
     public String sayHello() {
+        log.info("Hello world");
         return "Hello Java Backend";
     }
 
@@ -56,8 +61,9 @@ public class HelloController {
 
     // HTTP POST: /users request (Post user data to server)
     @PostMapping("/users")
-    public ResponseEntity<String> postName(@RequestBody UserRepo user) {
-        String name = user.getFullName();
+    public ResponseEntity<String> postName(@RequestBody User user) {
+        // String name = user.getFullName();
+        String name = "Ritik";
 
         System.out.println("Received name: " + name);
         return ResponseEntity.ok("User created with name: " + name);

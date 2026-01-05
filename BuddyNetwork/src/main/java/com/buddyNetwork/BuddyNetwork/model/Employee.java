@@ -26,13 +26,14 @@ public class Employee {
     @JsonIgnore
     private String department;
 
-    private Department department2;
+    // private Department department2;
 
     public Employee(Long id, String name, String department, LocalDate dateOfBirth) {
         this.id = id;
         this.name = name;
         this.department = department;
         this.dateOfBirth = dateOfBirth;
+        // this.department2 = dep;
     }
 
     public Employee(Long id, String name, LocalDate dateOfBirth) {
