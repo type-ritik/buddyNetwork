@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.buddyNetwork.BuddyNetwork.dto.UserAuthLoginRequestDTO;
+import com.buddyNetwork.BuddyNetwork.dto.UserAuthLoginResponseDTO;
 import com.buddyNetwork.BuddyNetwork.dto.UserAuthRequestDTO;
 import com.buddyNetwork.BuddyNetwork.dto.UserAuthResponseDTO;
-import com.buddyNetwork.BuddyNetwork.model.User;
 import com.buddyNetwork.BuddyNetwork.service.UserService;
 // import org.springframework.security.authentication.AuthenticationManager;
 // import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,18 +44,20 @@ public class AuthenticateUser {
     public ResponseEntity<UserAuthResponseDTO> signupUser(
             @Valid @RequestBody UserAuthRequestDTO request) {
         // Call UserService to handle signup logic (to be implemented)
-        User userEntity = new User(request);
-        UserAuthResponseDTO userAuth = userService.createUser(userEntity);
+        log.info("User Registration Start");
+        UserAuthResponseDTO userAuth = userService.createUser(request);
+
+        log.info("User Register Successfully!");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userAuth);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@Valid @RequestBody UserAuthLoginRequestDTO req) {
-        User userEntity = new User(req);
-        log.info("User Entity: " + userEntity.getEmail());
+    public ResponseEntity<UserAuthLoginResponseDTO> loginUser(@Valid @RequestBody UserAuthLoginRequestDTO req) {
+        log.info("User Login Start");
+        log.info("User entity is created");
+        UserAuthLoginResponseDTO userAuth = userService.authenticateUser(req);
         log.info("User logged in Successfully!");
-        User userAuth = userService.authenticateUser(userEntity);
-        return ResponseEntity.ok(userAuth);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userAuth);
     }
 }

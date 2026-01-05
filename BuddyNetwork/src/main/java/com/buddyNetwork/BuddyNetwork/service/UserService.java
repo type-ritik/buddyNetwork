@@ -4,10 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.buddyNetwork.BuddyNetwork.dto.UserAuthLoginRequestDTO;
+import com.buddyNetwork.BuddyNetwork.dto.UserAuthLoginResponseDTO;
+import com.buddyNetwork.BuddyNetwork.dto.UserAuthRequestDTO;
 import com.buddyNetwork.BuddyNetwork.dto.UserAuthResponseDTO;
 import com.buddyNetwork.BuddyNetwork.model.User;
 import com.buddyNetwork.BuddyNetwork.repository.UserRepository;
+import com.buddyNetwork.BuddyNetwork.utility.JwtUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class UserService {
 
@@ -17,51 +24,82 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository _userRepository) {
+    private JwtUtil jwtService;
+
+    public UserService(UserRepository _userRepository, JwtUtil jwtSerUtil) {
         this.userRepository = _userRepository;
+        this.jwtService = jwtSerUtil;
     }
 
-    public UserAuthResponseDTO createUser(User reqUser) {
+    public UserAuthResponseDTO createUser(UserAuthRequestDTO reqUser) {
+        log.info("User Signup Service start");
 
-        if (reqUser.getEmail() == null) {
+        if (reqUser.email() == null) {
+            log.info("Invalid email");
+
             throw new IllegalArgumentException("Email is required");
         }
 
-        if (reqUser.getPassword() == null) {
+        if (reqUser.password() == null) {
+            log.info("Invalid password");
+
             throw new IllegalArgumentException("Password is required");
         }
 
-        if (reqUser.getUsername() == null) {
+        if (reqUser.username() == null) {
+            log.info("Invalid Username");
+
             throw new IllegalArgumentException("Username is required");
         }
 
-        if (reqUser.getFullname() == null) {
+        if (reqUser.fullname() == null) {
+            log.info("Invalid Fullname");
             throw new IllegalArgumentException("Fullname is required");
         }
 
-        reqUser.setPassword(passwordEncoder.encode(reqUser.getPassword()));
+        User newUser = new User();
+        newUser.setEmail(reqUser.email());
+        newUser.setUsername(reqUser.username());
+        newUser.setFullname(reqUser.fullname());
+        newUser.setPassword(passwordEncoder.encode(reqUser.password()));
+        newUser.setGender(reqUser.gender());
+        log.info("User password encrypted");
 
-        User savedUser = userRepository.save(reqUser);
+        User savedUser = userRepository.save(newUser);
+        log.info("User saved in database");
 
-        UserAuthResponseDTO response = new UserAuthResponseDTO(savedUser.getId(), savedUser.getEmail(),
-                savedUser.getFullname(), savedUser.getUsername());
+        String token = jwtService.generateToken(savedUser);
+        log.info("Token generated");
+
+        UserAuthResponseDTO response = new UserAuthResponseDTO(savedUser, token);
+
+        log.info("User Signup response created");
 
         return response;
 
     }
 
-    public User authenticateUser(User reqUser) {
-        User existingUser = userRepository.findByEmail(reqUser.getEmail());
+    public UserAuthLoginResponseDTO authenticateUser(UserAuthLoginRequestDTO reqUser) {
+        log.info("User Authentication Service start");
+        User existingUser = userRepository.findByEmail(reqUser.email());
 
         if (existingUser == null) {
+            log.info("Invalid email");
             throw new IllegalArgumentException("Invalid email or password");
         }
 
-        if (!passwordEncoder.matches(reqUser.getPassword(), existingUser.getPassword())) {
+        if (!passwordEncoder.matches(reqUser.password(), existingUser.getPassword())) {
+            log.info("Invalid password");
             throw new IllegalArgumentException("Invalid email or password");
         }
+        log.info("User found");
 
-        return existingUser;
+        String token = jwtService.generateToken(existingUser);
+        log.info("Token is created");
+
+        UserAuthLoginResponseDTO loginResponse = new UserAuthLoginResponseDTO(existingUser, token);
+        log.info("User Login response is created");
+        return loginResponse;
     }
 
     public User loadUserByUsername(String username) {
