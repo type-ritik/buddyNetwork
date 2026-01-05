@@ -68,13 +68,11 @@ public class User implements UserDetails {
         this.fullname = userAuthRequestDTO.fullname();
         this.password = userAuthRequestDTO.password();
         this.email = userAuthRequestDTO.email();
-        this.gender = userAuthRequestDTO.gender();
-        this.isadmin = userAuthRequestDTO.isadmin();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(() -> getIsadmin() ? "ROLE_ADMIN" : "ROLE_USER");
     }
 
     @Override
