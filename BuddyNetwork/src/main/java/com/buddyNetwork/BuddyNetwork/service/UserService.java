@@ -3,6 +3,7 @@ package com.buddyNetwork.BuddyNetwork.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.buddyNetwork.BuddyNetwork.dto.UserAuthLoginRequestDTO;
 import com.buddyNetwork.BuddyNetwork.dto.UserAuthLoginResponseDTO;
@@ -11,6 +12,7 @@ import com.buddyNetwork.BuddyNetwork.dto.UserAuthResponseDTO;
 import com.buddyNetwork.BuddyNetwork.model.User;
 import com.buddyNetwork.BuddyNetwork.repository.UserRepository;
 import com.buddyNetwork.BuddyNetwork.utility.JwtUtil;
+import com.buddyNetwork.BuddyNetwork.utility.ResourceNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
 
     @Autowired
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -31,30 +33,31 @@ public class UserService {
         this.jwtService = jwtSerUtil;
     }
 
+    @Transactional
     public UserAuthResponseDTO createUser(UserAuthRequestDTO reqUser) {
         log.info("User Signup Service start");
 
         if (reqUser.email() == null) {
             log.info("Invalid email");
 
-            throw new IllegalArgumentException("Email is required");
+            throw new ResourceNotFoundException("Email is required");
         }
 
         if (reqUser.password() == null) {
             log.info("Invalid password");
 
-            throw new IllegalArgumentException("Password is required");
+            throw new ResourceNotFoundException("Password is required");
         }
 
         if (reqUser.username() == null) {
             log.info("Invalid Username");
 
-            throw new IllegalArgumentException("Username is required");
+            throw new ResourceNotFoundException("Username is required");
         }
 
         if (reqUser.fullname() == null) {
             log.info("Invalid Fullname");
-            throw new IllegalArgumentException("Fullname is required");
+            throw new ResourceNotFoundException("Fullname is required");
         }
 
         User newUser = new User();
@@ -65,17 +68,22 @@ public class UserService {
         newUser.setGender(reqUser.gender());
         log.info("User password encrypted");
 
-        User savedUser = userRepository.save(newUser);
-        log.info("User saved in database");
+        try {
+            User savedUser = userRepository.save(newUser);
+            log.info("User saved in database");
 
-        String token = jwtService.generateToken(savedUser);
-        log.info("Token generated");
+            String token = jwtService.generateToken(savedUser);
+            log.info("Token generated");
 
-        UserAuthResponseDTO response = new UserAuthResponseDTO(savedUser, token);
+            UserAuthResponseDTO response = new UserAuthResponseDTO(savedUser, token);
 
-        log.info("User Signup response created");
+            log.info("User Signup response created");
 
-        return response;
+            return response;
+        } catch (ResourceNotFoundException e) {
+            log.error("Error occurred during saving user details");
+            throw new ResourceNotFoundException("Failed to create user");
+        }
 
     }
 

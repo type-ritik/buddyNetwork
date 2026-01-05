@@ -20,6 +20,8 @@ import com.buddyNetwork.BuddyNetwork.dto.UserAuthResponseDTO;
 import com.buddyNetwork.BuddyNetwork.service.UserService;
 // import org.springframework.security.authentication.AuthenticationManager;
 // import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import com.buddyNetwork.BuddyNetwork.utility.ApiResponse;
+import com.buddyNetwork.BuddyNetwork.utility.ResponseUtil;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +43,7 @@ public class AuthenticateUser {
 
     // HTTP POST: /auth/signup request (Create new User Account)
     @PostMapping("/register")
-    public ResponseEntity<UserAuthResponseDTO> signupUser(
+    public ResponseEntity<ApiResponse<UserAuthResponseDTO>> signupUser(
             @Valid @RequestBody UserAuthRequestDTO request) {
         // Call UserService to handle signup logic (to be implemented)
         log.info("User Registration Start");
@@ -49,7 +51,7 @@ public class AuthenticateUser {
 
         log.info("User Register Successfully!");
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userAuth);
+        return ResponseEntity.ok(ResponseUtil.success(userAuth, "User Register Successfully", "/"));
     }
 
     @PostMapping("/login")
