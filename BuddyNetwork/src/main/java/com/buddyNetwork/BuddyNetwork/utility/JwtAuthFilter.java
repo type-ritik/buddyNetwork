@@ -16,7 +16,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtil jwtService;
@@ -34,7 +36,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // Skip JWT check for public endpoints
         if (path.startsWith("/api/auth/v1/register") || path.startsWith("/api/auth/v1/login")
-                || path.equals("/api/public")) {
+                || path.equals("/api/public") || path.equals("/main.js")
+                || path.equals("/index.html") || path.equals("/") || path.equals("/ws/**") || path.equals("/hello")) {
             filter.doFilter(req, res);
             return;
         }
@@ -46,6 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
                 String userName = jwtService.extractUsername(token);
+                log.info("AuthHeader: " + userName);
 
                 if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails user = userService.loadUserByUsername(userName);
